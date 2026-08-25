@@ -1,0 +1,54 @@
+# Example systemd unit for the Dwell backend.
+#
+# This is a template. Copy it to /etc/systemd/system/ and replace every
+# YOUR-* / /path/to placeholder below with your own values before enabling.
+# Alternatively, move the Environment= lines into a 0600 file and reference it
+# with:   EnvironmentFile=/path/to/dwell.env
+#
+# Never commit your real values. Treat the MCP public base URL and the contents
+# of DWELL_MCP_TOKEN_FILE as credentials.
+
+[Unit]
+Description=Dwell private companion web backend
+After=network-online.target dwell-thinking.service
+Wants=network-online.target dwell-thinking.service
+
+[Service]
+Type=simple
+# Path to your Dwell checkout (this repository).
+WorkingDirectory=/path/to/dwell-clean
+ExecStart=/usr/bin/python3 -m backend.app
+Environment=PYTHONUNBUFFERED=1
+# Bind to loopback by default. Put Dwell behind a trusted proxy or set
+# DWELL_PASSWORD before exposing it beyond 127.0.0.1.
+Environment=DWELL_BIND=127.0.0.1
+Environment=DWELL_PORT=8765
+# Where Dwell stores its SQLite database, books and generated files.
+Environment=DWELL_DATA_DIR=/path/to/dwell-data
+Environment=DWELL_REPO_PATH=/path/to/dwell-clean
+# Public base that the owner-only /mcp-link page uses to build the capability URL.
+Environment=DWELL_MCP_PUBLIC_BASE=https://your-domain.example/dwell-mcp
+Environment=DWELL_MCP_TOKEN_FILE=/path/to/dwell-data/mcp-route-token
+# Optional: bind the /mcp-link page to one signed-in account of another local
+# service that returns {"user":{"id":...}}. Leave both empty to skip the check.
+Environment=DWELL_MCP_OWNER_CHECK_URL=http://127.0.0.1:YOUR-PORT/api/account/me
+Environment=DWELL_MCP_OWNER_USER_ID=YOUR-OWNER-ID
+# Display name of the resident shown in the Dwell UI and Recents. Any value.
+Environment=DWELL_MCP_RESIDENT_NAME=驻客
+# Thinking-block MCP (sibylsea-hub/gpt-thinking-block-mcp), usually loopback.
+Environment=THINKING_MCP_URL=http://127.0.0.1:8787/mcp
+# Optional sticker MCP. Leave empty to disable sticker search/send.
+Environment=DWELL_STICKER_MCP_URL=
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+# Must match DWELL_DATA_DIR above.
+ReadWritePaths=/path/to/dwell-data
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+MemoryMax=384M
+
+[Install]
+WantedBy=multi-user.target

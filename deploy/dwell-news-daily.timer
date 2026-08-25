@@ -1,0 +1,11 @@
+[Unit]
+Description=Generate the Dwell news report every morning
+
+[Timer]
+OnCalendar=*-*-* 07:00:00 Asia/Shanghai
+Persistent=true
+AccuracySec=1min
+Unit=dwell-news-daily.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,3 @@
+# Optional native acceleration for hybrid history retrieval.
+# Semantic embeddings still require DWELL_EMBEDDING_* provider configuration.
+sqlite-vec>=0.1.6,<0.2

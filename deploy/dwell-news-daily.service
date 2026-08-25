@@ -1,0 +1,28 @@
+# Example systemd unit for the daily Dwell news report.
+#
+# Replace /path/to below with your own checkout and data directories before
+# enabling. Pair with dwell-news-daily.timer.
+
+[Unit]
+Description=Generate the daily Dwell news report
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# Path to your Dwell checkout.
+WorkingDirectory=/path/to/dwell-clean
+ExecStart=/usr/bin/python3 -m tools.news_daily
+Environment=PYTHONUNBUFFERED=1
+# Where Dwell stores its database (must match dwell.service).
+Environment=DWELL_DATA_DIR=/path/to/dwell-data
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+# Must match DWELL_DATA_DIR above.
+ReadWritePaths=/path/to/dwell-data
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+UMask=0077
+MemoryMax=256M
+TimeoutStartSec=20min

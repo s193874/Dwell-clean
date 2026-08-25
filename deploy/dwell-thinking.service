@@ -1,0 +1,30 @@
+# Example systemd unit for the thinking-block MCP that Dwell calls.
+#
+# Runs the sibling gpt-thinking-block-mcp service. Replace /path/to below with
+# your own checkout path and pick a port that matches THINKING_MCP_URL in
+# dwell.service.
+
+[Unit]
+Description=GPT Thinking Block MCP for Dwell
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Path to your gpt-thinking-block-mcp checkout.
+WorkingDirectory=/path/to/gpt-thinking-block-mcp
+# The port argument must match THINKING_MCP_URL in dwell.service.
+ExecStart=/usr/bin/python3 server.py 8787
+Environment=PYTHONUNBUFFERED=1
+Environment=THINKING_PROMPT_LANGUAGE=zh-CN
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+MemoryMax=128M
+
+[Install]
+WantedBy=multi-user.target
